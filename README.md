@@ -36,6 +36,25 @@ To run in the background:
 docker compose up -d
 ```
 
+### Running on Custom Host Ports (e.g. Ports 3010 and 3011)
+
+You can specify custom ports via environment variables:
+
+```bash
+CBS_PORT=3010 DIGITAL_PORT=3011 docker compose up -d --build
+```
+
+Or by creating a `.env` file:
+```bash
+cp .env.example .env
+# Edit CBS_PORT=3010 and DIGITAL_PORT=3011 in .env
+docker compose up -d --build
+```
+
+After starting:
+- **CBS Server**: `http://<server-ip>:3010/docs`
+- **Omnichannel Digital Backend**: `http://<server-ip>:3011/docs`
+
 To stop:
 ```bash
 docker compose down
