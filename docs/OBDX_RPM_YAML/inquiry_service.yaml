@@ -1,0 +1,123 @@
+#----------------------------- OFSS-COPYRIGHT-BEGIN -----------------------------
+#
+#  This source is part of the Oracle Financial Services Software Limited.
+#  Copyright 2020, Oracle Financial Services Software Limited. All rights reserved.
+#
+#  No part of this work may be reproduced, stored in a retrieval system, adopted or transmitted in any form or by any means, electronic, mechanical, photographic, graphic, optic recording or otherwise, translated in any language or computer language, without the prior written permission of Oracle and/or its affiliates.
+#
+#  Oracle Financial Services Software Limited.
+#  Oracle Park, Off Western Express Highway,
+#  Goregaon (East),
+#  Mumbai - 400 063, India.
+#
+# ------------------------------- OFSS-COPYRIGHT-END -----------------------------
+
+swagger: '2.0'
+info:
+  description: You can find out more about Swagger at [swagger.io](http://swagger.io) and about data types at [Swagger Data Types](https://swagger.io/docs/specification/data-models/data-types/)
+  version: 1.0.0
+  title: RPM Inquiry Services
+host: 10.184.157.121:9000
+basePath: /obremo-rpm-process-driver-services
+tags:
+  - name: InquiryService
+    description: Service for Inquiry screen & all filters
+schemes:
+  - http
+paths:
+  /service/inquiry/applicationsList:
+    get:
+      produces:
+        - application/json
+        - application/xml
+      tags:
+        - InquiryService
+      summary: get list of all applications as per the filter
+      description: get list of all applications as per the filter
+      operationId: getListOfApplications
+      parameters:       
+        - name: fromDate
+          in: query
+          description: Application date From Filter
+          required: false
+          type: string
+        - name: toDate
+          in: query
+          description: Application date To Filter
+          required: false
+          type: string
+        - name: applicationNo
+          in: query
+          description: Application number
+          required: false
+          type: string
+        - name: processRefNo
+          in: query
+          description: Process reference number
+          type: string
+          required: false
+        - name: productType
+          in: query
+          description: Product Type
+          required: false
+          type: string
+        - name: productSubType
+          in: query
+          description: Product sub type
+          required: false
+          type: string
+        - name: productName
+          in: query
+          description: Business Product name
+          type: string
+          required: false
+        - name: custName
+          in: query
+          description: Customer Name
+          required: false
+          type: string
+        - name: custMobile
+          in: query
+          description: Customer mobile number
+          required: false
+          type: string
+        - name: custEmail
+          in: query
+          description: Customer email id
+          required: false
+          type: string
+        - name: branchCode
+          in: query
+          description: branch code
+          required: false
+          type: string
+        - name: channel
+          in: query
+          description: channel
+          required: true
+          type: string
+        - name: offset
+          in: query
+          description: offset is starting no of records to be fetched
+          required: false
+          type: integer
+        - name: limit
+          in: query
+          description: limit is maximum no of records to be fetched
+          required: false
+          type: integer
+      responses:
+        201:
+          description: Returns the domain with the count of applications initiated by the RM
+          schema:
+            $ref: "#/definitions/ApplicationsList"
+        400:
+          description: Malformed syntax.
+        401:
+          description: Request does not have sufficient credentials.
+        403:
+          description: Request is not authorized.
+        405:
+          description: Invalid input
+        500:
+          description: Internal error

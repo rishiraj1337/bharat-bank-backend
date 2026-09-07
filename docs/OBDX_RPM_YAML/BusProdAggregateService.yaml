@@ -1,0 +1,717 @@
+#-----------------------------------------------------------------------------------------------------
+#  **
+#  ** File Name  : common.yaml
+#  **
+#  ** Module     : RPM
+#  ** 
+#  ** This source is part of the Oracle Financial Services Software Limited.** 
+#  ** 
+#  ** All rights reserved. No part of this work may be reproduced, stored in a retrieval system,
+#  ** adopted or transmitted in any form or by any means, electronic, mechanical, photographic,
+#  ** graphic, optic recording or otherwise, translated in any language or computer language,
+#  ** without the prior written permission of Oracle Financial Services Software Limited.
+#  ** 
+#  ** Oracle Financial Services Software Limited.
+#  ** 10-11, SDF I, SEEPZ, Andheri (East),
+#  ** Mumbai - 400 096.
+#  ** India
+#  ** Copyright 2020, Oracle Financial Services Software Limited. All rights reserved.
+#  ------------------------------------------------------------------------------------------------------- 
+
+swagger: "2.0"
+info:
+ description: "This is a sample server obremo-ds-rpm-businessproducts-details server." 
+ version: "1.0.0"
+ title: "businessproducts"
+host: "api-plato.us.oracle.com:8080"
+basePath: "/api/1.0"
+consumes:
+ - "application/json"
+produces:
+ - "application/json"
+tags:
+ - name: "businessproducts"
+   description: "Service API for Business Product"
+
+schemes:
+- "https"
+
+paths:
+
+# path to create a new record and fetch all valid records or by intent
+#
+#  supprorted http methods POST and GET
+#
+# path example ../obremo-ds-rpm-businessproducts-details
+
+ /service/businessproducts:
+  get:
+   tags:
+    - "businessproduct"
+   summary: "Get all valid businessproducts for a given product type"
+   description:  "Get all valid businessproducts for a given product type. This endpoints will be used to Get all valid businessproduct maintenance records for a given product type."
+   operationId: "getByProductType"
+   parameters:
+   - name: "productType"
+     in: query
+     description: "product type of the Business Products"
+     required: false
+     type: string
+   - name: "channel"
+     in: query
+     description: "Channel"
+     required: false
+     type: string
+   - name: "businessProductCode"
+     in: query
+     description: "Business Product Code"
+     required: false
+     type: string
+   responses:
+    201:
+     description: "Returns message of succes or failure"
+     headers: 
+      Location:
+       description: ""
+       type: "string"
+     schema:
+       $ref: "#/definitions/BusProdAggregateServiceModelCollection"
+    400:
+     description: "Malformed syntax."
+    401:
+     description: "Request does not have sufficient credentials."
+    403:
+     description: "Request is not authorized."
+    405:
+     description: "Invalid input"
+    500:
+     description: "Internal error"
+
+definitions:
+  BusProdAggregateServiceModel:
+    description: BusProdAggregateServiceModel
+    type: object
+    properties:
+      businessProductDetails:
+        $ref: '#/definitions/BusProdDetailsServiceModel'
+      businessProductPreferences:
+        $ref: '#/definitions/BusProdPrefServiceModel'
+      businessProductHost:
+        $ref: '#/definitions/BusProdHostServiceModel'
+      businessProductAttr:
+        $ref: '#/definitions/BusProdAttrServiceModel'
+  BusProdDetailsServiceModel:
+    type: object
+    properties:
+      channel:
+        type: array
+        items:
+          type: object
+      businessProductCode:
+        type: string
+        description: ""
+        maxLength: 6
+      businessProductDesc:
+        type: string
+        description: ""
+      businessProductName:
+        type: string
+        description: ""
+      expiryDate:
+        type: string
+        format: date
+        description: ""
+      productSubType:
+        type: string
+        description: ""
+      productType:
+        type: string
+        description: ""
+      reviewDate:
+        type: string
+        format: date
+        description: ""
+      startDate:
+        type: string
+        format: date
+        description: ""
+      fintech:
+        type: array
+        items:
+          type: object 
+      fintechAllowed:
+        type: string
+        description: ""
+        pattern: '[Y,N]'
+  BusProdPrefServiceModel:
+    type: object
+    properties: 
+     appRetentionPeriod:
+      type: number
+      description: ""
+     appRetentionType:
+      type: string
+      description: ""
+     minAgeBasis:
+      type: string
+      description: ""
+     minAge:
+      type: number
+      description: ""
+     maxAgeBasis:
+      type: string
+      description: ""
+     maxAge:
+      type: number
+      description: ""  
+     businessProductCode:
+      type: string
+      description: ""
+     channelAllowed:
+      type: string
+      description: ""
+      pattern: '[Y,N]'
+     comments:
+      type: string
+      description: ""
+     currencyAllowed:
+      type: array
+      items:
+       type: object
+     customerStatus:
+      type: string
+      description: ""
+     fintech:
+      type: array
+      items:
+       type: object 
+     fintechAllowed:
+      type: string
+      description: ""
+      pattern: '[Y,N]'
+     productSubType:
+      type: string
+      description: ""
+     productType:
+      type: string
+      description: ""
+     residentialStatus:
+      type: string
+      description: ""
+     BusProdPrefComp:
+       $ref: '#/definitions/BusProdPrefCompModel'
+    required:
+     - businessProductCode
+     - productType
+  BusProdPrefCompModel:
+    type: object
+    properties:
+     assesmentMethod:
+      type: array
+      items:
+       type: object 
+     assesUnsecuredLoans:
+      type: array
+      items:
+       type: object 
+     autoRollover:
+      type: string
+      description: ""
+      pattern: '[Y,N]'
+     businessProductCode:
+      type: string
+      description: ""
+     chequebook:
+      type: string
+      description: ""
+      pattern: '[Y,N]'
+     debitcard:
+      type: string
+      description: ""
+      pattern: '[Y,N]'
+     directBanking:
+      type: string
+      description: ""
+      pattern: '[Y,N]'
+     initFunding:
+      type: string
+      description: ""
+      pattern: '[Y,N]'
+     intRateTreat:
+      type: string
+      description: ""
+     kioskBanking:
+      type: string
+      description: ""
+      pattern: '[Y,N]'
+     mgnConsidered:
+      type: number
+      description: ""
+     minFundingAmt:
+      type: number
+      description: ""
+     minFundingCcy:
+      type: string
+      description: ""
+     moratoriumAllowed:
+      type: string
+      description: ""
+      pattern: '[Y,N]'
+     mxApplcntHandling:
+      type: string
+      description: ""
+     mxDisbmt:
+      type: string
+      description: ""
+      pattern: '[Y,N]'
+     odLimitAllowed:
+      type: string
+      description: ""
+      pattern: '[Y,N]'
+     offerAccptMethod:
+      type: string
+      description: ""
+     offerAmendment:
+      type: string
+      description: ""
+      pattern: '[Y,N]'
+     offerExpryPer:
+      type: string
+      description: ""
+     offerExpryPerType:
+      type: number
+      description: ""
+     passbook:
+      type: string
+      description: ""
+      pattern: '[Y,N]'
+     peggedPeriod:
+      type: number
+      description: ""
+     peggedPeriodType:
+      type: string
+      description: ""
+     phoneBanking:
+      type: string
+      description: ""
+      pattern: '[Y,N]'
+     prodPrefMasterId:
+      type: string
+      description: ""
+     qualScorecardDesc:
+      type: string
+      description: ""
+     qualScorecardId:
+      type: string
+      description: ""
+     quanScorecardDesc:
+      type: string
+      description: ""
+     quanScorecardId:
+      type: string
+      description: ""
+     repaymentType:
+      type: array
+      items:
+       type: object
+     scorecardType:
+      type: string
+      description: ""
+     scrOnlyPapplcnt:
+      type: string
+      description: ""
+      pattern: '[Y,N]'
+     agency:
+      type: array
+      items:
+       type: object      
+     todAllowed:
+      type: string
+      description: ""
+      pattern: '[Y,N]'
+     unclearedFunds:
+      type: string
+      description: ""
+      pattern: '[Y,N]'
+     extScrOnlyPapplcnt:
+      type: string
+      description: ""
+      pattern: '[Y,N]'
+     extMxApplcntHandling:
+      type: string
+      description: ""
+     BusProdCcyConfig:
+      type: array
+      items:
+       $ref: '#/definitions/BusProdCcyConfigModel'
+     IntlScrCrdDecnboxDTO:
+      type: array
+      items:
+       $ref: '#/definitions/BusProdDecnboxModel'
+     ExtScrCrdDecnboxDTO:
+      type: array
+      items:
+       $ref: '#/definitions/BusProdDecnboxModel'
+  BusProdCcyConfigModel:
+    type: object
+    properties:
+     currency:
+      type: string
+      description: ""
+     id:
+      type: string
+      description: ""
+     maxAmount:
+      type: number
+      description: ""
+     maxTerm:
+      type: number
+      description: ""
+     minAmount:
+      type: number
+      description: ""
+     minTerm:
+      type: number
+      description: ""
+     prodPrefCompId:
+      type: string
+      description: ""
+     minTermTenorBasis:
+      type: string
+      description: "" 
+     maxTermTenorBasis:
+      type: string
+      description: "" 
+  BusProdDecnboxModel:
+    type: object
+    properties:
+      id:
+        type: string
+        description: ""
+      scorecardType:
+        type: string
+        description: ""  
+      maxScore:
+        type: number
+        description: ""
+      minScore:
+        type: number
+        description: ""
+      outcome:
+        type: string
+        description: ""
+      prodPrefCompId:
+        type: string
+        description: ""
+      serialNo:
+        description: Decision Box sequence number
+        type: integer 
+  BusProdHostServiceModel:
+    type: object
+    properties:
+      businessProductCode:
+        type: string
+        description: ""
+      productType:
+        type: string
+        description: ""
+      productSubType:
+        type: string
+        description: ""          
+      hostProductCode:
+        type: string
+        description: ""
+      BussProdComponent:
+        type: array
+        items:
+          $ref: '#/definitions/BusProdComponentServiceModel'
+    required:
+     - businessProductCode
+     - hostProductCode
+  BusProdComponentServiceModel:
+    type: object
+    properties:
+      businessProductCode:
+        type: string
+        description: ""
+      bussprodMasterId:
+        type: string
+        description: ""
+      componentCode:
+        type: string
+        description: ""
+      componentType:
+        type: string
+        description: ""
+        pattern: '[Y,N]'
+      description:
+        type: string
+        description: ""
+      display:
+        type: string
+        description: ""
+      displayName:
+        type: string
+        description: ""
+      hostProductCode:
+        type: string
+        description: ""
+      serialNo:
+        description: Component sequence number
+        type: integer 
+      waiverAllowed:
+        type: string
+        description: ""
+        pattern: '[Y,N]'
+      ammendAllowed:
+        type: string
+        description: ""
+        pattern: '[Y,N]'  
+      BusProdUde:
+        type: array
+        items:
+          $ref: '#/definitions/BusProdUdeServiceModel'
+  BusProdUdeServiceModel:
+    type: object
+    properties:
+      ammendAllowed:
+        type: string
+        description: ""
+      businessProductCode:
+        type: string
+        description: ""
+      bussprodComponentId:
+        type: string
+        description: ""
+      componentCode:
+        type: string
+        description: ""
+      des:
+        type: string
+        description: ""
+      display:
+        type: string
+        description: ""
+      displayName:
+        type: string
+        description: ""
+      hostProductCode:
+        type: string
+        description: ""
+      marginAllowed:
+        type: string
+        description: ""
+      udeId:
+        type: string
+        description: ""
+      waiverAllowed:
+        type: string
+        description: ""
+      BusProdFormula:
+        type: array
+        items:
+          $ref: '#/definitions/BusProdFormulaServiceModel'
+  BusProdFormulaServiceModel:
+    type: object
+    properties:
+      businessProductCode:
+        type: string
+        description: ""
+      bussprodUdeId:
+        type: string
+        description: ""
+      card:
+        type: string
+        description: ""
+      chargeBasis:
+        type: string
+        description: ""
+      code:
+        type: string
+        description: ""
+      componentCode:
+        type: string
+        description: ""
+      description:
+        type: string
+        description: ""
+      displayName:
+        type: string
+        description: ""
+      formulaName:
+        type: string
+        description: ""
+      frequency:
+        type: string
+        description: ""
+      hostProductCode:
+        type: string
+        description: ""
+      result:
+        type: string
+        description: ""
+      rules:
+        type: string
+        description: ""
+      type:
+        type: string
+        description: ""
+  BusProdAttrServiceModel:
+    type: object
+    properties:
+      businessProductCode:
+        type: string
+        description: ""
+      productSubType:
+        type: string
+        description: ""
+      productType:
+        type: string
+        description: ""     
+      businessProductImage:
+        type: string
+        description: ""
+      businessProductSummary:
+        type: string
+        description: ""
+        maxLength: 200
+      comments:
+        type: string
+        description: ""
+      productBrochure:
+        type: string
+        description: ""
+      termsandcondition:
+        type: string
+        description: ""
+      BusProdAttrFeature:
+        type: array
+        items:
+          $ref: '#/definitions/BusProdAttrFeatureServiceModel'
+      BusProdAttrElgb:
+        type: array
+        items:
+          $ref: '#/definitions/BusProdAttrElgbServiceModel'
+      BusProdAttrFeeCharges:
+        type: array
+        items:
+          $ref: '#/definitions/BusProdAttrFeeChargesServiceModel'
+    required:
+    - businessProductCode
+  BusProdAttrFeatureServiceModel:
+    type: object
+    properties:
+      businessProductCode:
+        type: string
+        description: ""
+      dispOnCat:
+        type: string
+        description: ""
+      featureDesc:
+        type: string
+        description: ""
+      featureName:
+        type: string
+        description: ""
+      prodAttrMasterId:
+        type: string
+        description: ""
+    required:
+    - businessProductCode
+  BusProdAttrElgbServiceModel:
+    type: object
+    properties:
+      businessProductCode:
+        type: string
+        description: ""
+      dispOnCat:
+        type: string
+        description: ""
+      eligDesc:
+        type: string
+        description: ""
+      eligName:
+        type: string
+        description: ""
+      prodAttrMasterId:
+        type: string
+        description: ""
+    required:
+     - businessProductCode
+  BusProdAttrFeeChargesServiceModel:
+    type: object
+    properties:
+      businessProductCode:
+        type: string
+        description: ""
+        maxLength: 6
+      dispOnCat:
+        type: string
+        description: ""
+      feeChargesDesc:
+        type: string
+        description: ""
+        maxLength: 400
+      feeChargesName:
+        type: string
+        description: ""
+        maxLength: 100
+      prodAttrMasterId:
+        type: string
+        description: ""
+    required:
+     - businessProductCode
+  ResponseDto:
+    type: object
+    properties:
+      id:
+        type: string
+      status:
+        type: string
+      codes:
+        type: array
+        items:
+          $ref: "#/definitions/ResponseCode"
+      requestId:
+        type: string
+  ResponseCode:
+    type: object
+    properties:
+      Code:
+        type: string
+      Desc:
+        type: string
+      Type:
+        type: string
+      Language:
+        type: string
+      args:
+        type: array
+        items:
+          type: object
+      arg:
+        type: string
+  BusProdAggregateServiceModelCollection: 
+    description: "Collection of businessproduct."
+    type: "object"
+    properties:
+     data:
+      type: "array"
+      items: 
+       $ref: "#/definitions/BusProdAggregateServiceModel"
+     paging:
+      $ref: "#/definitions/PagingDto"
+  PagingDto:
+    type: object
+    properties:
+      totalResults:
+        type: integer
+  ResponseDtoWrapper:
+    type: object
+    properties:
+      messages:
+        $ref: "#/definitions/ResponseDto"
+      data:
+        $ref: "#/definitions/ResponseResourceSupport"
+  ResponseResourceSupport:
+    type: object

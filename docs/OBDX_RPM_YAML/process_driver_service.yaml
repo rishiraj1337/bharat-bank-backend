@@ -1,0 +1,255 @@
+#----------------------------- OFSS-COPYRIGHT-BEGIN ----------------------------- 
+#
+#  This source is part of the Oracle Financial Services Software Limited.
+#  Copyright 2020, Oracle Financial Services Software Limited. All rights reserved.
+#  
+#  No part of this work may be reproduced, stored in a retrieval system, adopted or transmitted in any form or by any means, electronic, mechanical, photographic, graphic, optic recording or otherwise, translated in any language or computer language, without the prior written permission of Oracle and/or its affiliates.
+#  
+#  Oracle Financial Services Software Limited.
+#  Oracle Park, Off Western Express Highway,
+#  Goregaon (East), 
+#  Mumbai - 400 063, India. 
+#  
+# ------------------------------- OFSS-COPYRIGHT-END -----------------------------
+
+swagger: '2.0'
+info:
+  description: You can find out more about Swagger at [swagger.io](http://swagger.io) and about data types at [Swagger Data Types](https://swagger.io/docs/specification/data-models/data-types/)
+  version: 1.0.0
+  title: Process Driver Service
+host: 10.184.157.121:9000
+basePath: /obremo-rpm-process-driver-services
+tags:
+- name: ProcessDriverService
+  description: Service API for Orchestration of RPM Operations
+schemes:
+- http
+paths:
+  /service/initiate:
+    post:
+      consumes:
+      - application/json
+      - application/xml
+      produces:
+      - application/json
+      - application/xml
+      tags:
+      - ProcessDriverService
+      summary: Initiate process, generates application number, updates Task controller & starts a workflow.
+      description: Initiate process, generates application number, updates Task controller & starts a workflow.
+      operationId: initiate
+      parameters:
+      - name: initiateModel
+        in: body
+        description: Request Body that contains data required for creating a new BasicApplicationDetails
+        required: true
+        schema:
+          $ref: '#/definitions/BasicApplicationDetailsModel'
+      responses:
+        201:
+          description: Returns the Application number of the newly created BasicApplicationDetails
+          headers:
+            Location:
+              description: URL of newly created BasicApplicationDetails
+              type: string
+          schema:
+            $ref: '#/definitions/ResponseDtoWrapper'
+        400:
+          description: Malformed syntax.
+        401:
+          description: Request does not have sufficient credentials.
+        403:
+          description: Request is not authorized.
+        405:
+          description: Invalid input
+        500:
+          description: Internal error
+  /service/submit:
+    post:
+      produces:
+      - application/json
+      - application/xml
+      tags:
+      - ProcessDriverService
+      summary: Save or Submit application from External System
+      description: Save or Submit application from External System
+      operationId: submitExtSystem
+      parameters:
+        - name: "data"
+          in: "body"
+          description: "Request Body that contains data required for creating a new Process Definition"
+          required: true
+          schema:
+            $ref: "#/definitions/SubmitExtSystem"
+      responses:
+        201:
+         description: "Returns the Id of the newly created  Process Definition"
+         headers:
+          Location:
+           description: "URL of newly created  Process Definition"
+           type: "string"
+         schema:
+           $ref: "#/definitions/ResponseDtoWrapper"
+        400:
+          description: "Malformed syntax."
+        401:
+          description: "Request does not have sufficient credentials."
+        403:
+          description: "Request is not authorized."
+        405:
+          description: "Invalid input"
+        500:
+          description: "Internal error"
+  /service/getData/{applicationNo}:
+    get:
+      produces:
+      - application/json
+      - application/xml
+      tags:
+      - ProcessDriverService
+      summary: Get data for External System
+      description: Get data for External System
+      operationId: getDataExtSystem
+      parameters:
+        - name: "applicationNo"
+          in: "path"
+          description: "Application Number"
+          required: true
+          type: string
+      responses:
+        200:
+          description: Returns Applicationtransaction flows data for the given query parameters
+          schema:
+            $ref: '#/definitions/SubmitExtSystem'
+        400:
+          description: Malformed syntax.
+        401:
+          description: Request does not have sufficient credentials.
+        403:
+          description: Request is not authorized.
+        405:
+          description: Invalid input
+        500:
+          description: Internal error
+  /service/getDocumentList:
+    get:
+      produces:
+      - application/json
+      - application/xml
+      tags:
+      - ProcessDriverService
+      summary: Get Document List data for a Business Product
+      description: Get Document List data for a Business Product
+      operationId: getDocumentList
+      parameters:
+        - name: "applicationNo"
+          in: "query"
+          description: "Application Number"
+          required: false
+          type: string
+        - name: "businessProductCode"
+          in: "query"
+          description: "Business Product Code"
+          required: false
+          type: string
+        - name: "productType"
+          in: "query"
+          description: "Product Type"
+          required: false
+          type: string
+      responses:
+        200:
+          description: Returns list of documents required for a Business Product or Application Number
+          schema:
+            $ref: '#/definitions/DocumentCollection'
+        400:
+          description: Malformed syntax.
+        401:
+          description: Request does not have sufficient credentials.
+        403:
+          description: Request is not authorized.
+        405:
+          description: Invalid input
+        500:
+          description: Internal error
+definitions:
+  ResponseDtoWrapper:
+    type: object
+    properties:
+      messages:
+        $ref: '#/definitions/ResponseDto'
+      data:
+        $ref: '#/definitions/ResponseResourceSupport'
+  ResponseResourceSupport:
+    allOf:
+      - type: object
+        discriminator: resouce_type
+  SubmitExtSystem:
+    description: Application Submit from External System
+    type: object
+    allOf:
+    - $ref: '#/definitions/ResponseResourceSupport'
+    properties:
+      channel:
+        description: External System where application is originating
+        type: string
+      action:
+        description: Save or Submit Flag
+        type: string
+      applicationNumber:
+        description: Application Number
+        type: string
+      remarks:
+        description: Remarks during termination
+        type: string
+      products:
+        description: Product list
+        type: array
+        items:
+          $ref: object
+      domainData:
+        $ref: '#/definitions/DomainData'
+  DomainData:
+    description: Domain specific data
+    type: object
+    properties:
+      CmnApplicant:
+        description: Common Applicant domain
+        type: object
+      LoanAccOpenProcess:
+        description: Loan Account Domain
+        type: array
+        items:
+          $ref: object
+      SavingAccOpenProcess:
+        description: Savings Account Domain
+        type: array
+        items:
+          $ref: object
+      CurrentAccOpenProcess:
+        description: Current Account domain
+        type: array
+        items:
+          $ref: object
+  ChannelResponse:
+    description: Response to channel
+    type: object
+    properties:
+      status:
+        description: status
+        type: string
+      errorCodes:
+        description: Error codes
+        type: array
+        items:
+          $ref: object
+      data:
+        $ref: '#/definitions/SubmitExtSystem'
+  DocumentCollection:
+    description: "Collection of Documents."
+    type: "object"
+    properties:
+     data:
+      type: "array"
+      items: 
+       $ref: "#/definitions/DocumentModel"
