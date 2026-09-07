@@ -21,6 +21,7 @@ from digital_backend.routers.flutter import loans as flutter_loans
 from digital_backend.routers.flutter import bill_payments as flutter_bill_payments
 from digital_backend.routers.flutter import cheques as flutter_cheques
 from digital_backend.routers.flutter import services as flutter_services
+from digital_backend.routers.flutter_v2 import flutter_v2_master_router
 
 # Import React Admin Routers
 from digital_backend.routers.admin import users as admin_users
@@ -105,13 +106,40 @@ admin_master_router.include_router(admin_theme_config.router)
 
 # Mount Routers onto FastAPI App
 app.include_router(flutter_master_router)
+app.include_router(flutter_v2_master_router)
 app.include_router(admin_master_router)
 
 # ==========================================================
 # OpenAPI Schemas Cache & Generation
 # ==========================================================
 _openapi_flutter_cache: Optional[Dict[str, Any]] = None
+_openapi_flutter_v2_cache: Optional[Dict[str, Any]] = None
 _openapi_admin_cache: Optional[Dict[str, Any]] = None
+
+
+@app.get("/openapi-flutter-v2.json", include_in_schema=False)
+async def get_openapi_flutter_v2():
+    global _openapi_flutter_v2_cache
+    if _openapi_flutter_v2_cache is None:
+        _openapi_flutter_v2_cache = get_openapi(
+            title="Bharat Bank Mobile App - Flutter Collection v2 (Latest Superset)",
+            version="2.0.0",
+            description="""
+### Collection 1: Flutter Mobile Banking Application APIs (v2 Superset)
+- **Superset Architecture:** Full backward compatibility with all v1 mobile banking endpoints plus extended capabilities.
+- **Enhanced Auth & Security:** Session invalidation & logout (`POST /auth/logout`), MPIN verify/set, Biometric login, and OTP verification.
+- **Customer Profile:** Comprehensive customer profile with KYC, PAN, contact, and notification preferences (`GET /profile`).
+- **In-App Notifications:** Real-time transaction alerts, security events, bill due reminders, and read tracking (`GET /notifications`, `PUT /notifications/{id}/read`).
+- **Dashboard & Accounts:** Composite `/dashboard` endpoint, 360 account details, statements, spending limits, and uncleared funds.
+- **Fund Transfers:** Within Bank, IMPS, NEFT, RTGS, Quick transfers, and Scheduled standing instructions.
+- **Beneficiaries & Cards:** Payee directory with cooling periods, debit/credit card controls, lock/unlock, and limits.
+- **Term Deposits (FD & RD):** Fixed Deposits and Recurring Deposits creation with monthly auto-debit schedule (`POST /deposits/open-rd`), calculators, and deposit advice.
+- **BBPS & Utility Bill Payments:** Bill fetching, instant bill pay, scheduled future payments (`POST /bills/schedule`), recurring auto-pay mandates (`POST /bills/recurring`), registered saved billers (`GET /bills/registered-billers`, `DELETE /bills/registered-billers/{id}`), and transaction status verification (`GET /bills/{transaction_id}/status`).
+- **Cheques & Ancillary Services:** Cheque book requests, stop cheque, nominee management, and digital ePassbook.
+""",
+            routes=flutter_v2_master_router.routes
+        )
+    return _openapi_flutter_v2_cache
 
 
 @app.get("/openapi-flutter.json", include_in_schema=False)
@@ -119,10 +147,10 @@ async def get_openapi_flutter():
     global _openapi_flutter_cache
     if _openapi_flutter_cache is None:
         _openapi_flutter_cache = get_openapi(
-            title="Bharat Bank Mobile App - Flutter Collection",
+            title="Bharat Bank Mobile App - Flutter Collection v1 (Legacy)",
             version="1.0.0",
             description="""
-### Collection 1: Flutter Mobile Banking Application APIs
+### Collection 1: Flutter Mobile Banking Application APIs (v1)
 - **System & Dynamics:** `/version` health & versioning, `/theme` dynamic light/dark colors and typography.
 - **Authentication & Security:** MPIN verify/set, Biometric login, OTP verification, Registration & Password recovery.
 - **Dashboard:** Composite `/dashboard` endpoint serving accounts, quick actions, 16 banking service modules, credit card widgets, recent transactions, and pre-approved loan offers.
@@ -130,7 +158,7 @@ async def get_openapi_flutter():
 - **Fund Transfers:** Within Bank, IMPS, NEFT, RTGS, Quick transfers, Scheduled recurring payments, and IFSC lookup.
 - **Beneficiaries:** Payee directory with cooling-period enforcement and NPCI penny-drop validation.
 - **Cards Management:** Signature Mastercard & RuPay Platinum Debit card controls, instant lock/unlock, blocking, and bill payment.
-- **Term Deposits & Loans:** Online FD/RD creation, maturity calculator, deposit advice, loan portfolio, and amortization schedules.
+- **Term Deposits & Loans:** Online FD creation, maturity calculator, deposit advice, loan portfolio, and amortization schedules.
 - **BBPS & Utilities:** Utility bill fetching and payments, mobile recharges, and biller management.
 - **Cheques & Services:** Cheque book requests, stop cheque, nominee management, and shareable IFSC cards.
 """,
@@ -232,19 +260,23 @@ async def custom_swagger_ui_html():
         window.ui = SwaggerUIBundle({
             urls: [
                 {
-                    name: "1. Flutter Mobile App (Customer Experience APIs)",
+                    name: "1. Flutter Mobile App v2 (Latest - Superset APIs)",
+                    url: "/openapi-flutter-v2.json"
+                },
+                {
+                    name: "2. Flutter Mobile App v1 (Customer Experience APIs)",
                     url: "/openapi-flutter.json"
                 },
                 {
-                    name: "2. React Admin Console (Operations & CBS Backoffice)",
+                    name: "3. React Admin Console (Operations & CBS Backoffice)",
                     url: "/openapi-admin.json"
                 },
                 {
-                    name: "3. All Digital Banking APIs (Combined)",
+                    name: "4. All Digital Banking APIs (Combined)",
                     url: "/openapi.json"
                 }
             ],
-            "urls.primaryName": "1. Flutter Mobile App (Customer Experience APIs)",
+            "urls.primaryName": "1. Flutter Mobile App v2 (Latest - Superset APIs)",
             dom_id: '#swagger-ui',
             deepLinking: true,
             presets: [
@@ -278,7 +310,7 @@ async def health_check():
         "status": "UP",
         "service": settings.app_name,
         "version": settings.version,
-        "collections": ["flutter", "admin"]
+        "collections": ["flutter", "flutter_v2", "admin"]
     }
 
 

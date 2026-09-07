@@ -1194,6 +1194,170 @@ class MockDataStore:
             }
         ]
 
+        # 18. Customer In-App Notifications
+        self.notifications = [
+            {
+                "notification_id": "NOTIF-101",
+                "cif": "CIF100001",
+                "category": "TRANSACTION",
+                "title": "Salary Credited",
+                "message": "₹2,25,000.00 credited to account ending 0012 by Nexus Tech Enterprises.",
+                "timestamp": "2026-09-07T04:30:00Z",
+                "is_read": False,
+                "action_url": "/accounts/101000000012/statement",
+                "icon": "arrow_downward"
+            },
+            {
+                "notification_id": "NOTIF-102",
+                "cif": "CIF100001",
+                "category": "BILL_DUE",
+                "title": "Adani Electricity Bill Due",
+                "message": "Bill amount of ₹4,500.00 is due on 20 Sep 2026. Pay now to avoid late fees.",
+                "timestamp": "2026-09-06T10:15:00Z",
+                "is_read": False,
+                "action_url": "/bills/pay",
+                "icon": "flash_on"
+            },
+            {
+                "notification_id": "NOTIF-103",
+                "cif": "CIF100001",
+                "category": "SECURITY",
+                "title": "New Device Login Detected",
+                "message": "Login to Bharat Bank Mobile detected on iPhone 15 Pro Max at 09:42 AM.",
+                "timestamp": "2026-09-05T09:42:00Z",
+                "is_read": True,
+                "action_url": "/profile/security",
+                "icon": "security"
+            },
+            {
+                "notification_id": "NOTIF-104",
+                "cif": "CIF100001",
+                "category": "OFFER",
+                "title": "Special Monsoon FD Rates",
+                "message": "Lock in guaranteed 7.75% p.a. on 444 Days Special Monsoon Fixed Deposit.",
+                "timestamp": "2026-09-04T12:00:00Z",
+                "is_read": True,
+                "action_url": "/deposits/open-fd",
+                "icon": "savings"
+            }
+        ]
+
+        # 19. Registered Utility Billers (Saved in Customer Profile)
+        self.registered_billers = [
+            {
+                "registered_biller_id": "REG-BLR-001",
+                "cif": "CIF100001",
+                "biller_id": "BLR-ADANI-MUM",
+                "biller_name": "Adani Electricity Mumbai Limited",
+                "category_id": "ELECTRICITY",
+                "category_name": "Electricity",
+                "consumer_number": "1029384756",
+                "nickname": "Bandra Apartment Electricity",
+                "auto_pay_enabled": False,
+                "last_paid_amount": 4500.00,
+                "last_paid_date": "2026-08-14",
+                "created_at": "2025-06-10T10:00:00Z"
+            },
+            {
+                "registered_biller_id": "REG-BLR-002",
+                "cif": "CIF100001",
+                "biller_id": "BLR-MAHAVITARAN",
+                "biller_name": "MSEDCL (Mahavitaran)",
+                "category_id": "ELECTRICITY",
+                "category_name": "Electricity",
+                "consumer_number": "991823019283",
+                "nickname": "Pune Farmhouse Power",
+                "auto_pay_enabled": False,
+                "last_paid_amount": 1820.00,
+                "last_paid_date": "2026-08-01",
+                "created_at": "2025-08-15T11:20:00Z"
+            },
+            {
+                "registered_biller_id": "REG-BLR-003",
+                "cif": "CIF100001",
+                "biller_id": "BLR-AIRTEL-FIBER",
+                "biller_name": "Bharti Airtel Broadband",
+                "category_id": "BROADBAND",
+                "category_name": "Broadband & Landline",
+                "consumer_number": "02226489102",
+                "nickname": "Home Wi-Fi Gigabit",
+                "auto_pay_enabled": True,
+                "last_paid_amount": 1179.00,
+                "last_paid_date": "2026-08-28",
+                "created_at": "2025-09-01T14:30:00Z"
+            }
+        ]
+
+        # 20. Scheduled & Recurring Utility Bill Payments
+        self.scheduled_bills = [
+            {
+                "schedule_id": "SCH-BILL-001",
+                "cif": "CIF100001",
+                "biller_id": "BLR-ADANI-MUM",
+                "biller_name": "Adani Electricity Mumbai Limited",
+                "consumer_number": "1029384756",
+                "debit_account_number": "101000000012",
+                "amount": 4500.00,
+                "formatted_amount": "₹4,500.00",
+                "scheduled_date": "2026-09-18",
+                "notes": "Scheduled before due date",
+                "status": "SCHEDULED",
+                "created_at": "2026-09-07T08:00:00Z"
+            }
+        ]
+
+        self.recurring_bills = [
+            {
+                "mandate_id": "REC-BILL-001",
+                "cif": "CIF100001",
+                "biller_id": "BLR-AIRTEL-FIBER",
+                "biller_name": "Bharti Airtel Broadband",
+                "consumer_number": "02226489102",
+                "debit_account_number": "101000000012",
+                "max_auto_pay_amount": 2000.00,
+                "formatted_max_amount": "₹2,000.00",
+                "frequency": "MONTHLY",
+                "start_date": "2026-09-01",
+                "end_date": "2027-09-01",
+                "status": "ACTIVE",
+                "next_due_date": "2026-09-28"
+            }
+        ]
+
+        # 21. Bill Payment Transactions Store (with final status)
+        self.bill_transactions = {
+            "BBPS-20260907-001": {
+                "transaction_id": "BBPS-20260907-001",
+                "bbps_reference_no": "BBPS99102830182",
+                "biller_id": "BLR-ADANI-MUM",
+                "biller_name": "Adani Electricity Mumbai Limited",
+                "consumer_number": "1029384756",
+                "amount": 4500.00,
+                "formatted_amount": "₹4,500.00",
+                "payment_status": "SUCCESS",
+                "payment_timestamp": "2026-09-07T09:30:00Z",
+                "payment_mode": "BBPS_DEBIT",
+                "debit_account_number": "101000000012",
+                "npci_txn_ref": "NPCI20260907100029",
+                "receipt_url": "https://bbps.bharatbank.com/receipts/BBPS-20260907-001.pdf"
+            },
+            "BBPS-20260904-002": {
+                "transaction_id": "BBPS-20260904-002",
+                "bbps_reference_no": "BBPS88192039101",
+                "biller_id": "BLR-AIRTEL-FIBER",
+                "biller_name": "Bharti Airtel Broadband",
+                "consumer_number": "02226489102",
+                "amount": 1179.00,
+                "formatted_amount": "₹1,179.00",
+                "payment_status": "SUCCESS",
+                "payment_timestamp": "2026-09-04T14:20:00Z",
+                "payment_mode": "BBPS_DEBIT",
+                "debit_account_number": "101000000012",
+                "npci_txn_ref": "NPCI20260904142011",
+                "receipt_url": "https://bbps.bharatbank.com/receipts/BBPS-20260904-002.pdf"
+            }
+        }
+
 
 # Singleton instance
 mock_db = MockDataStore()

@@ -652,3 +652,101 @@ class NachMandateItem(BaseModel):
     start_date: str = Field(..., example="2025-01-01")
     end_date: str = Field(..., example="2035-01-01")
     status: str = Field(default="ACTIVE", example="ACTIVE")
+
+
+# ==========================================================
+# 11. Flutter v2 Enhanced Schemas (Profile, Notifications, RD & BBPS)
+# ==========================================================
+
+class CustomerProfileResponse(BaseModel):
+    cif: str = Field(..., example="CIF100001")
+    full_name: str = Field(..., example="Arjun Mehta")
+    customer_type: str = Field(..., example="RETAIL")
+    email: str = Field(..., example="arjun.mehta@bharatbank.com")
+    mobile_number: str = Field(..., example="9876543210")
+    pan_number: str = Field(..., example="ABCDE1234F")
+    aadhaar_masked: str = Field(..., example="XXXX-XXXX-9182")
+    date_of_birth: str = Field(..., example="1992-05-14")
+    gender: str = Field(..., example="MALE")
+    address: str = Field(..., example="102, Palm Heights, Bandra West, Mumbai 400050")
+    kyc_status: str = Field(..., example="VERIFIED")
+    kyc_verified_on: str = Field(..., example="2024-01-16")
+    digital_profile_status: str = Field(..., example="ACTIVE")
+    home_branch: str = Field(..., example="Nariman Point (001)")
+    avatar_url: Optional[str] = Field(default=None, example="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150")
+    communication_preferences: Dict[str, bool] = Field(
+        default_factory=lambda: {"email_alerts": True, "sms_alerts": True, "push_notifications": True, "whatsapp_alerts": True}
+    )
+    last_login: str = Field(..., example="Today, 09:42 AM")
+    registered_accounts_count: int = Field(default=3, example=3)
+
+
+class NotificationItem(BaseModel):
+    notification_id: str = Field(..., example="NOTIF-101")
+    category: str = Field(..., example="TRANSACTION", description="TRANSACTION, BILL_DUE, SECURITY, OFFER, SYSTEM")
+    title: str = Field(..., example="Salary Credited")
+    message: str = Field(..., example="₹2,25,000.00 credited to account ending 0012 by Nexus Tech Enterprises.")
+    timestamp: str = Field(..., example="2026-09-07T04:30:00Z")
+    is_read: bool = Field(default=False, example=False)
+    action_url: Optional[str] = Field(default=None, example="/accounts/101000000012/statement")
+    icon: Optional[str] = Field(default="notifications", example="arrow_downward")
+
+
+class OpenRecurringDepositRequest(BaseModel):
+    debit_account_number: str = Field(..., example="101000000012")
+    monthly_installment_amount: float = Field(..., example=5000.00, description="Monthly RD installment amount in INR")
+    tenure_months: int = Field(..., example=12, description="RD tenure in months (6 to 120)")
+    installment_day: int = Field(default=5, example=5, description="Day of month for automatic installment debit (1-28)")
+    auto_debit: bool = Field(default=True, example=True)
+    nominee_name: Optional[str] = Field(default=None, example="Sneha Mehta")
+
+
+class ScheduleBillPaymentRequest(BaseModel):
+    biller_id: str = Field(..., example="BLR-ADANI-MUM")
+    biller_name: str = Field(..., example="Adani Electricity Mumbai Limited")
+    consumer_number: str = Field(..., example="1029384756")
+    debit_account_number: str = Field(..., example="101000000012")
+    amount: float = Field(..., example=4500.00)
+    scheduled_date: str = Field(..., example="2026-09-18", description="Future date for one-time execution (YYYY-MM-DD)")
+    notes: Optional[str] = Field(default=None, example="Scheduled before due date")
+
+
+class RecurringBillPaymentRequest(BaseModel):
+    biller_id: str = Field(..., example="BLR-AIRTEL-FIBER")
+    biller_name: str = Field(..., example="Bharti Airtel Broadband")
+    consumer_number: str = Field(..., example="02226489102")
+    debit_account_number: str = Field(..., example="101000000012")
+    max_auto_pay_amount: float = Field(..., example=2000.00, description="Maximum amount authorized per automatic debit")
+    frequency: str = Field(default="MONTHLY", example="MONTHLY", description="MONTHLY, BI_MONTHLY, QUARTERLY")
+    start_date: str = Field(..., example="2026-09-01")
+    end_date: Optional[str] = Field(default="2027-09-01", example="2027-09-01")
+
+
+class RegisteredBillerItem(BaseModel):
+    registered_biller_id: str = Field(..., example="REG-BLR-001")
+    biller_id: str = Field(..., example="BLR-ADANI-MUM")
+    biller_name: str = Field(..., example="Adani Electricity Mumbai Limited")
+    category_id: str = Field(..., example="ELECTRICITY")
+    category_name: str = Field(..., example="Electricity")
+    consumer_number: str = Field(..., example="1029384756")
+    nickname: str = Field(..., example="Bandra Apartment Electricity")
+    auto_pay_enabled: bool = Field(default=False, example=False)
+    last_paid_amount: Optional[float] = Field(default=None, example=4500.00)
+    last_paid_date: Optional[str] = Field(default=None, example="2026-08-14")
+    created_at: str = Field(..., example="2025-06-10T10:00:00Z")
+
+
+class BillPaymentStatusResponse(BaseModel):
+    transaction_id: str = Field(..., example="BBPS-20260907-001")
+    bbps_reference_no: str = Field(..., example="BBPS99102830182")
+    biller_id: str = Field(..., example="BLR-ADANI-MUM")
+    biller_name: str = Field(..., example="Adani Electricity Mumbai Limited")
+    consumer_number: str = Field(..., example="1029384756")
+    amount: float = Field(..., example=4500.00)
+    formatted_amount: str = Field(..., example="₹4,500.00")
+    payment_status: str = Field(..., example="SUCCESS", description="SUCCESS, PENDING, FAILED")
+    payment_timestamp: str = Field(..., example="2026-09-07T09:30:00Z")
+    payment_mode: str = Field(default="BBPS_DEBIT", example="BBPS_DEBIT")
+    debit_account_number: str = Field(..., example="101000000012")
+    npci_txn_ref: str = Field(..., example="NPCI20260907100029")
+    receipt_url: str = Field(..., example="https://bbps.bharatbank.com/receipts/BBPS-20260907-001.pdf")

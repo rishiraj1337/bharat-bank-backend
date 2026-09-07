@@ -17,8 +17,9 @@ graph TD
    - Oracle FLEXCUBE & OBDX/RPM integration contracts (Collections v1, v2, v3).
    - Swagger UI: [http://localhost:8000/docs](http://localhost:8000/docs)
 2. **Omnichannel Digital Banking Backend (`:8080`)**:
-   - **Collection 1 (Flutter App):** Dynamic Theming, Versioning, Composite Dashboard, Accounts 360, Fund Transfers (Within Bank, IMPS, NEFT, RTGS), Beneficiary Directory, Cards, Term Deposits, Loans, BBPS Utilities, Cheque Services, and Offline ePassbook.
-   - **Collection 2 (React Admin):** Admin User/Role Management (US-20), Customer & CIF Linkage (US-21), Payment Authorization Matrix & Corporate Hierarchies (US-22), Switch Operations, Service Requests, Dynamic Theme Studio, and Audit Reports (US-23).
+   - **Collection 1 (Flutter App v2 - Latest Superset):** Base `/api/v2/app`. Full superset of mobile APIs plus Server-side Logout (`POST /auth/logout`), Customer Profile 360 (`GET /profile`), In-App Notifications Stream & Read Tracking (`GET /notifications`, `PUT /notifications/{id}/read`), Online Recurring Deposit creation (`POST /deposits/open-rd`), Scheduled Bill Payments (`POST /bills/schedule`), Recurring Auto-Pay Mandates (`POST /bills/recurring`), Registered Billers Management (`GET /bills/registered-billers`, `DELETE /bills/registered-billers/{id}`), and Real-Time Bill Payment Status (`GET /bills/{transaction_id}/status`).
+   - **Collection 2 (Flutter App v1 - Legacy):** Base `/api/v1/app`. Preserved intact for existing mobile builds.
+   - **Collection 3 (React Admin Console):** Base `/api/v1/admin`. Admin User/Role Management (US-20), Customer & CIF Linkage (US-21), Payment Authorization Matrix & Corporate Hierarchies (US-22), Switch Operations, Service Requests, CBS Account Servicing, Loan Underwriting, Cheque Clearing, and Audit Reports (US-23).
    - Multi-Collection Swagger UI with Dropdown: [http://localhost:8080/docs](http://localhost:8080/docs)
 
 ---

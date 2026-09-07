@@ -334,6 +334,137 @@ def test_admin_cbs_backoffice_endpoints():
     assert res.status_code == 200
     assert len(res.json()["data"]) >= 2
 
+
+def test_flutter_v2_superset_endpoints():
+    # 1. Verify OpenAPI v2 Schema
+    res_v2 = client.get("/openapi-flutter-v2.json")
+    assert res_v2.status_code == 200
+    paths = res_v2.json()["paths"]
+    assert "/api/v2/app/auth/logout" in paths
+    assert "/api/v2/app/profile" in paths
+    assert "/api/v2/app/notifications" in paths
+    assert "/api/v2/app/notifications/{notification_id}/read" in paths
+    assert "/api/v2/app/deposits/open-rd" in paths
+    assert "/api/v2/app/bills/schedule" in paths
+    assert "/api/v2/app/bills/recurring" in paths
+    assert "/api/v2/app/bills/registered-billers" in paths
+    assert "/api/v2/app/bills/registered-billers/{registered_biller_id}" in paths
+    assert "/api/v2/app/bills/{transaction_id}/status" in paths
+    # Verify v1 superset inheritance
+    assert "/api/v2/app/dashboard" in paths
+    assert "/api/v2/app/accounts" in paths
+    assert "/api/v2/app/transfers/initiate" in paths
+
+    # 2. Logout - POST /api/v2/app/auth/logout
+    res = client.post("/api/v2/app/auth/logout", headers={"Authorization": "Bearer mock_test_token"})
+    assert res.status_code == 200
+    assert res.json()["success"] is True
+    assert "logged out" in res.json()["message"].lower()
+
+    # 3. Profile - GET /api/v2/app/profile
+    res = client.get("/api/v2/app/profile?cif=CIF100001")
+    assert res.status_code == 200
+    prof = res.json()["data"]
+    assert prof["cif"] == "CIF100001"
+    assert prof["full_name"] == "Arjun Mehta"
+    assert prof["kyc_status"] == "VERIFIED"
+    assert prof["registered_accounts_count"] >= 2
+    assert "email_alerts" in prof["communication_preferences"]
+
+    # 4. Notifications - GET /api/v2/app/notifications
+    res = client.get("/api/v2/app/notifications?cif=CIF100001")
+    assert res.status_code == 200
+    notifs = res.json()["data"]
+    assert len(notifs) >= 3
+    first_notif_id = notifs[0]["notification_id"]
+
+    # 5. Notifications/{id}/read - PUT /api/v2/app/notifications/{id}/read
+    res = client.put(f"/api/v2/app/notifications/{first_notif_id}/read")
+    assert res.status_code == 200
+    assert res.json()["success"] is True
+
+    # 6. Open-RD - POST /api/v2/app/deposits/open-rd
+    res = client.post("/api/v2/app/deposits/open-rd", json={
+        "debit_account_number": "101000000012",
+        "monthly_installment_amount": 5000.00,
+        "tenure_months": 12,
+        "installment_day": 5,
+        "auto_debit": True,
+        "nominee_name": "Sneha Mehta"
+    })
+    assert res.status_code == 200
+    rd_data = res.json()["data"]
+    assert rd_data["deposit_type"] == "RECURRING_DEPOSIT"
+    assert rd_data["principal_amount"] == 5000.00
+    assert rd_data["maturity_amount"] > 60000.00
+
+    # 7. Bill Schedule - POST /api/v2/app/bills/schedule
+    res = client.post("/api/v2/app/bills/schedule", json={
+        "biller_id": "BLR-ADANI-MUM",
+        "biller_name": "Adani Electricity Mumbai Limited",
+        "consumer_number": "1029384756",
+        "debit_account_number": "101000000012",
+        "amount": 4500.00,
+        "scheduled_date": "2026-09-18",
+        "notes": "Electricity bill test schedule"
+    })
+    assert res.status_code == 200
+    assert res.json()["data"]["status"] == "SCHEDULED"
+
+    # 8. Bill Recurring - POST /api/v2/app/bills/recurring
+    res = client.post("/api/v2/app/bills/recurring", json={
+        "biller_id": "BLR-AIRTEL-FIBER",
+        "biller_name": "Bharti Airtel Broadband",
+        "consumer_number": "02226489102",
+        "debit_account_number": "101000000012",
+        "max_auto_pay_amount": 2500.00,
+        "frequency": "MONTHLY",
+        "start_date": "2026-09-01",
+        "end_date": "2027-09-01"
+    })
+    assert res.status_code == 200
+    assert res.json()["data"]["status"] == "ACTIVE"
+
+    # 9. Registered-billers - GET /api/v2/app/bills/registered-billers
+    res = client.get("/api/v2/app/bills/registered-billers?cif=CIF100001")
+    assert res.status_code == 200
+    billers = res.json()["data"]
+    assert len(billers) >= 2
+    biller_to_del = billers[0]["registered_biller_id"]
+
+    # 10. Registered-billers/{id} - DELETE /api/v2/app/bills/registered-billers/{id}
+    res = client.delete(f"/api/v2/app/bills/registered-billers/{biller_to_del}")
+    assert res.status_code == 200
+    assert res.json()["success"] is True
+
+    # 11. Bill status - GET /api/v2/app/bills/{transaction_id}/status
+    res = client.get("/api/v2/app/bills/BBPS-20260907-001/status")
+    assert res.status_code == 200
+    status_data = res.json()["data"]
+    assert status_data["transaction_id"] == "BBPS-20260907-001"
+    assert status_data["payment_status"] == "SUCCESS"
+    assert status_data["amount"] == 4500.00
+
+    # 12. Superset Verification: V1 APIs via /api/v2/app/
+    res = client.get("/api/v2/app/dashboard")
+    assert res.status_code == 200
+    assert res.json()["data"]["customer"]["name"] == "Arjun Mehta"
+
+    res = client.get("/api/v2/app/accounts")
+    assert res.status_code == 200
+
+    res = client.get("/api/v2/app/version")
+    assert res.status_code == 200
+
+    # 13. Ensure V1 APIs continue to work at /api/v1/app/
+    res = client.get("/api/v1/app/version")
+    assert res.status_code == 200
+    res = client.get("/api/v1/app/dashboard")
+    assert res.status_code == 200
+
+
 if __name__ == "__main__":
     test_admin_cbs_backoffice_endpoints()
     print("ALL CBS BACKOFFICE ADMIN INTEGRATION TESTS EXECUTED AND PASSED SUCCESSFULLY!")
+    test_flutter_v2_superset_endpoints()
+    print("ALL FLUTTER V2 SUPERSET INTEGRATION TESTS EXECUTED AND PASSED SUCCESSFULLY!")
